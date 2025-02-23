@@ -14,7 +14,7 @@ function predictSales() {
   document.getElementById("predict-btn").innerHTML = "⏳ Predicting...";
   document.getElementById("predict-btn").disabled = true;
 
-  fetch("http://127.0.0.1:5000/predict", {
+  fetch("https://first-ml-project-7z8r.onrender.com", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
