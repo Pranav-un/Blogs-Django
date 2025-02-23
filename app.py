@@ -9,9 +9,17 @@ from flask_cors import CORS  # To allow frontend requests
 app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend
 
-# Sample dataset (Temperature vs. Ice Cream Sales)
-data = 'ice.csv'
-df = pd.DataFrame(data)
+# Load dataset from CSV file
+try:
+    df = pd.read_csv('ice.csv')  # ✅ FIXED: Properly reading the CSV file
+except FileNotFoundError:
+    print("Error: 'ice.csv' file not found. Make sure the file is in the correct directory.")
+    exit(1)  # Stop execution if file is missing
+
+# Ensure the required columns exist
+if "Temperature" not in df.columns or "Sales" not in df.columns:
+    print("Error: 'ice.csv' must have 'Temperature' and 'Sales' columns.")
+    exit(1)
 
 # Extract X (features) and y (target variable)
 X = np.array(df["Temperature"]).reshape(-1, 1)
