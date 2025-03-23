@@ -53,16 +53,16 @@ A feature-rich blog platform built with Django that allows users to create, shar
 *Modern card-based layout with animated transitions*
 
 ### Post Detail
-![Post Detail](screenshots/post-detail.png)
+![Screenshot (17)](https://github.com/user-attachments/assets/17462429-36d2-4e1a-9139-f6cc6f483a9d)
+
 *Detailed view of a blog post with reactions and comments*
 
 ### User Profile
-![User Profile](screenshots/profile.png)
+![Screenshot (18)](https://github.com/user-attachments/assets/f1ce69b7-66f8-487a-a973-80d1b15d06c7)
+
 *User profile page with statistics and posts*
 
-### Admin Dashboard
-![Admin Dashboard](screenshots/admin.png)
-*Admin interface for managing content*
+
 
 ## 🚀 Installation
 
@@ -136,18 +136,3 @@ The project includes several custom template filters:
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🙏 Acknowledgments
-
-- Django framework and community
-- Bootstrap team for the UI framework
-- Font Awesome for icons
-- Animate.css for animations
-
-## 📝 Note
-
-To add screenshots to this project:
-1. Create a `screenshots` directory in the root of your project
-2. Add your screenshots with descriptive names (e.g., `home.png`, `post-detail.png`)
-3. Make sure the screenshots are high quality and showcase the key features
-4. Update the screenshot paths in this README to match your actual screenshot filenames 
