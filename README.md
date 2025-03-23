@@ -49,7 +49,7 @@ A feature-rich blog platform built with Django that allows users to create, shar
 ## 📸 Screenshots
 
 ### Home Page
-![Home Page](screenshots/home.png)
+![Screenshot (15)](https://github.com/user-attachments/assets/0dea4ec1-badc-42bf-84ad-86ca883b6e43)
 *Modern card-based layout with animated transitions*
 
 ### Post Detail
