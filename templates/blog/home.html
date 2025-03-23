@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+{% load blog_filters %}
+
+{% block title %}Home - Blog{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="jumbotron bg-light p-5 mb-5 rounded text-center animate__animated animate__fadeIn">
+        <h1 class="display-4 mb-3">Welcome to Our Blog</h1>
+        <p class="lead mb-0">Discover interesting articles, share your thoughts, and engage with our community.</p>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center">
+        {% for post in posts %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0 animate__animated animate__fadeInUp" style="animation-delay: {{ forloop.counter|multiply:0.2 }}s">
+                {% if post.image %}
+                <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                </div>
+                {% endif %}
+                <div class="card-body d-flex flex-column p-4">
+                    <h2 class="card-title h5 mb-3">
+                        <a href="{% url 'post-detail' post.pk %}" class="text-decoration-none text-dark hover-link">{{ post.title }}</a>
+                    </h2>
+                    <p class="card-text text-muted small mb-3">
+                        By <a href="{% url 'blogger-detail' post.author.pk %}" class="text-decoration-none hover-link">{{ post.author.user.username }}</a>
+                        on {{ post.created_date|date:"F j, Y" }}
+                    </p>
+                    <p class="card-text flex-grow-1 mb-4">{{ post.content|truncatewords:30 }}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                        <div class="reaction-stats">
+                            {% if user.is_authenticated %}
+                            <div class="reaction-dropdown">
+                                <button class="btn btn-sm btn-outline-primary reaction-btn {% if post|has_user_reacted:user %}active{% endif %}"
+                                        data-post-id="{{ post.pk }}"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                    <i class="fas {% if post|get_user_reaction_type:user == 'LIKE' %}fa-thumbs-up{% elif post|get_user_reaction_type:user == 'LOVE' %}fa-heart{% elif post|get_user_reaction_type:user == 'WOW' %}fa-surprise{% else %}fa-thumbs-up{% endif %}"></i>
+                                    <span class="count">{{ post.reactions.count }}</span>
+                                </button>
+                                <ul class="dropdown-menu reaction-menu animate__animated animate__fadeIn">
+                                    <li>
+                                        <button class="dropdown-item reaction-option" data-type="LIKE">
+                                            <i class="fas fa-thumbs-up text-primary"></i> Like
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item reaction-option" data-type="LOVE">
+                                            <i class="fas fa-heart text-danger"></i> Love
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item reaction-option" data-type="WOW">
+                                            <i class="fas fa-surprise text-warning"></i> Wow
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            {% else %}
+                            <div class="text-muted">
+                                <i class="fas fa-sign-in-alt"></i> <a href="{% url 'login' %}" class="hover-link">Login</a> to react
+                            </div>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'post-detail' post.pk %}" class="btn btn-outline-primary btn-sm px-3 hover-btn">Read More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info text-center animate__animated animate__fadeIn">
+                No posts available yet.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+    <nav aria-label="Page navigation" class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link hover-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+            </li>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+            <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                <a class="page-link hover-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link hover-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+<style>
+.reaction-dropdown {
+    position: relative;
+}
+
+.reaction-menu {
+    min-width: 150px;
+    padding: 0.5rem;
+    border: none;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.reaction-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.reaction-option:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    transform: translateX(5px);
+}
+
+.reaction-option i {
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+}
+
+.reaction-option:hover i {
+    transform: scale(1.2);
+}
+
+.reaction-btn {
+    min-width: 80px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.reaction-btn:hover {
+    transform: translateY(-2px);
+}
+
+.reaction-btn.active {
+    background-color: var(--bs-primary);
+    color: white;
+    transform: scale(1.05);
+}
+
+.reaction-btn.active i {
+    color: white;
+}
+
+.hover-link {
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.hover-link:hover {
+    color: var(--bs-primary) !important;
+}
+
+.hover-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--bs-primary);
+    transition: width 0.2s ease;
+}
+
+.hover-link:hover::after {
+    width: 100%;
+}
+
+.hover-btn {
+    transition: all 0.2s ease;
+}
+
+.hover-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate__fadeInUp {
+    animation: fadeInUp 0.5s ease forwards;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Handle reaction options
+    $('.reaction-option').click(function(e) {
+        e.preventDefault();
+        var option = $(this);
+        var type = option.data('type');
+        var postId = option.closest('.reaction-dropdown').find('.reaction-btn').data('post-id');
+        var button = option.closest('.reaction-dropdown').find('.reaction-btn');
+        
+        $.post('/post/' + postId + '/reaction/' + type + '/', {
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        })
+        .done(function(response) {
+            if (response.status === 'success') {
+                // Update the reaction button with animation
+                var totalCount = Object.values(response.counts).reduce((a, b) => a + b, 0);
+                button.find('.count').fadeOut(200, function() {
+                    $(this).text(totalCount).fadeIn(200);
+                });
+                
+                // Update the icon based on the reaction type with animation
+                var icon = button.find('i');
+                if (response.action === 'removed') {
+                    icon.removeClass('fa-heart fa-surprise').addClass('fa-thumbs-up');
+                    button.removeClass('active');
+                } else {
+                    icon.removeClass('fa-thumbs-up fa-heart fa-surprise');
+                    if (type === 'LIKE') {
+                        icon.addClass('fa-thumbs-up');
+                    } else if (type === 'LOVE') {
+                        icon.addClass('fa-heart');
+                    } else if (type === 'WOW') {
+                        icon.addClass('fa-surprise');
+                    }
+                    button.addClass('active');
+                }
+                
+                // Close the dropdown
+                button.dropdown('hide');
+            }
+        })
+        .fail(function() {
+            alert('Failed to update reaction. Please try again.');
+        });
+    });
+});
+</script>
+{% endblock %}

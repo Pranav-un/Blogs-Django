@@ -1,0 +1,290 @@
+/* Modern Variables */
+:root {
+    --primary-color: #2D3436;
+    --secondary-color: #636E72;
+    --accent-color: #00B894;
+    --background-color: #F5F6FA;
+    --card-color: rgba(255, 255, 255, 0.95);
+    --text-color: #2D3436;
+    --border-radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Global Styles */
+body {
+    background: var(--background-color);
+    background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3');
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    color: var(--text-color);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(45,52,54,0.8) 100%);
+    z-index: 0;
+}
+
+.container {
+    position: relative;
+    z-index: 1;
+    padding: 2rem;
+    max-width: 900px !important;
+}
+
+/* Card Styles */
+.card {
+    background: var(--card-color);
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    backdrop-filter: blur(10px);
+    transition: var(--transition);
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Typography */
+.display-4 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+    font-size: 2.5rem;
+}
+
+.lead {
+    color: var(--secondary-color);
+}
+
+/* Buttons and Interactions */
+.btn {
+    border-radius: 30px;
+    padding: 0.8rem 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: var(--transition);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.btn-primary {
+    background: var(--accent-color);
+    border: none;
+    box-shadow: 0 4px 15px rgba(0,184,148,0.2);
+}
+
+.btn-primary:hover {
+    background: #00A187;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,184,148,0.3);
+}
+
+/* Reactions Section */
+.reactions {
+    padding: 1rem 0;
+}
+
+.reaction-btn {
+    border-radius: 20px;
+    margin: 0 0.5rem;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.reaction-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease-out, height 0.6s ease-out;
+}
+
+.reaction-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.reaction-btn.active {
+    transform: scale(1.1);
+}
+
+/* Poll Styles */
+.progress {
+    height: 25px;
+    background-color: rgba(0,0,0,0.05);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+.poll-progress-bar {
+    background: linear-gradient(45deg, var(--accent-color), #00D1B2);
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.poll-progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        rgba(255,255,255,0) 0%,
+        rgba(255,255,255,0.2) 50%,
+        rgba(255,255,255,0) 100%
+    );
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.progress-text {
+    position: relative;
+    z-index: 1;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Comments Section */
+.comments {
+    margin-top: 3rem;
+}
+
+.comment-card {
+    transition: var(--transition);
+    margin-bottom: 1rem;
+}
+
+.comment-card:hover {
+    transform: translateX(5px);
+}
+
+/* Form Elements */
+.form-control {
+    border: 2px solid #E0E0E0;
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(0,184,148,0.1);
+}
+
+/* Alerts */
+.alert {
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 1rem 1.5rem;
+    margin: 1rem 0;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Loading States */
+.loading {
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .display-4 {
+        font-size: 2rem;
+    }
+
+    .btn {
+        padding: 0.6rem 1.2rem;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --background-color: #1A1A1A;
+        --card-color: rgba(45,52,54,0.95);
+        --text-color: #F5F6FA;
+        --secondary-color: #A0A0A0;
+    }
+
+    .form-control {
+        background: rgba(255,255,255,0.05);
+        border-color: rgba(255,255,255,0.1);
+        color: var(--text-color);
+    }
+
+    .form-control:focus {
+        background: rgba(255,255,255,0.1);
+    }
+}

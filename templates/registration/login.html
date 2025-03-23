@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Blog{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow slide-in">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">
+                        <i class="fas fa-sign-in-alt text-primary me-2"></i>Welcome Back
+                    </h2>
+                    
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        Your username and password didn't match. Please try again.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" class="needs-validation">
+                        {% csrf_token %}
+                        <div class="form-floating mb-3">
+                            <input type="text" name="username" id="id_username" 
+                                   class="form-control {% if form.errors %}is-invalid{% endif %}" 
+                                   placeholder="Username" required autofocus>
+                            <label for="id_username">
+                                <i class="fas fa-user me-2"></i>Username
+                            </label>
+                        </div>
+                        <div class="form-floating mb-4">
+                            <input type="password" name="password" id="id_password" 
+                                   class="form-control {% if form.errors %}is-invalid{% endif %}" 
+                                   placeholder="Password" required>
+                            <label for="id_password">
+                                <i class="fas fa-lock me-2"></i>Password
+                            </label>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </button>
+                            <a href="{% url 'register' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-user-plus me-2"></i>Don't have an account? Register
+                            </a>
+                        </div>
+                        <input type="hidden" name="next" value="{{ next }}">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-floating {
+    position: relative;
+}
+
+.form-floating > .form-control {
+    height: calc(3.5rem + 2px);
+    padding: 1rem 0.75rem;
+}
+
+.form-floating > label {
+    padding: 1rem 0.75rem;
+}
+
+/* Shake animation for invalid fields */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.is-invalid {
+    animation: shake 0.2s ease-in-out;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Focus on username field
+    document.getElementById('id_username').focus();
+});
+</script>
+{% endblock %}

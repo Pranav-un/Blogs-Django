@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}New{% endif %} Post{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card shadow-lg">
+        <div class="card-body">
+            <h1 class="card-title display-4 mb-4">
+                {% if form.instance.pk %}Edit{% else %}Create{% endif %} Post
+            </h1>
+            
+            <form method="post" enctype="multipart/form-data" class="post-form" novalidate>
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <label for="{{ form.title.id_for_label }}" class="form-label h5">Title</label>
+                    <input type="text" name="{{ form.title.name }}" 
+                           class="form-control form-control-lg {% if form.title.errors %}is-invalid{% endif %}"
+                           id="{{ form.title.id_for_label }}" required
+                           placeholder="Enter your post title"
+                           value="{{ form.title.value|default:'' }}">
+                    {% if form.title.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.title.errors|join:", " }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.content.id_for_label }}" class="form-label h5">Content</label>
+                    <textarea name="{{ form.content.name }}" 
+                              class="form-control {% if form.content.errors %}is-invalid{% endif %}"
+                              id="{{ form.content.id_for_label }}" rows="10" required
+                              placeholder="Write your post content here...">{{ form.content.value|default:'' }}</textarea>
+                    {% if form.content.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.content.errors|join:", " }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.image.id_for_label }}" class="form-label h5">Image</label>
+                    <div class="image-upload-container">
+                        <div class="image-preview-wrapper mb-3 {% if form.instance.image %}has-image{% endif %}">
+                            <img src="{% if form.instance.image %}{{ form.instance.image.url }}{% endif %}"
+                                 class="image-preview"
+                                 id="imagePreview"
+                                 alt="Image preview">
+                            <div class="image-overlay">
+                                <i class="fas fa-camera"></i>
+                                <span>Click to upload image</span>
+                            </div>
+                        </div>
+                        <input type="file" name="{{ form.image.name }}" 
+                               class="form-control {% if form.image.errors %}is-invalid{% endif %}"
+                               id="{{ form.image.id_for_label }}"
+                               accept="image/*"
+                               onchange="previewImage(this);">
+                        {% if form.image.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.image.errors|join:", " }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.image_caption.id_for_label }}" class="form-label h5">Image Caption</label>
+                    <input type="text" name="{{ form.image_caption.name }}" 
+                           class="form-control {% if form.image_caption.errors %}is-invalid{% endif %}"
+                           id="{{ form.image_caption.id_for_label }}"
+                           placeholder="Add a caption for your image"
+                           value="{{ form.image_caption.value|default:'' }}">
+                    {% if form.image_caption.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.image_caption.errors|join:", " }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.image_position.id_for_label }}" class="form-label h5">Image Position</label>
+                    <select name="{{ form.image_position.name }}" 
+                            class="form-select {% if form.image_position.errors %}is-invalid{% endif %}"
+                            id="{{ form.image_position.id_for_label }}">
+                        {% for value, label in form.image_position.field.choices %}
+                        <option value="{{ value }}" {% if form.image_position.value == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.image_position.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.image_position.errors|join:", " }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <button type="button" class="btn btn-outline-primary" onclick="generateRandomImage()">
+                        <i class="fas fa-random"></i> Generate Random Image
+                    </button>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i> Save Post
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Image Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img src="" id="modalPreviewImage" class="img-fluid" alt="Preview">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function previewImage(input) {
+    const preview = document.getElementById('imagePreview');
+    const wrapper = preview.closest('.image-preview-wrapper');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            wrapper.classList.add('has-image');
+            
+            // Show modal with preview
+            const modalImg = document.getElementById('modalPreviewImage');
+            modalImg.src = e.target.result;
+            new bootstrap.Modal(document.getElementById('imagePreviewModal')).show();
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function generateRandomImage() {
+    const topics = ['nature', 'technology', 'business', 'travel', 'food'];
+    const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+    const width = 800;
+    const height = 600;
+    
+    fetch(`https://source.unsplash.com/random/${width}x${height}/?${randomTopic}`)
+        .then(response => {
+            const preview = document.getElementById('imagePreview');
+            const wrapper = preview.closest('.image-preview-wrapper');
+            preview.src = response.url;
+            wrapper.classList.add('has-image');
+            
+            // Show modal with preview
+            const modalImg = document.getElementById('modalPreviewImage');
+            modalImg.src = response.url;
+            new bootstrap.Modal(document.getElementById('imagePreviewModal')).show();
+            
+            // Create a file from the image URL
+            fetch(response.url)
+                .then(res => res.blob())
+                .then(blob => {
+                    const file = new File([blob], "random-image.jpg", { type: "image/jpeg" });
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    document.getElementById('{{ form.image.id_for_label }}').files = dataTransfer.files;
+                });
+        });
+}
+
+// Enable image preview on click
+document.querySelector('.image-preview-wrapper').addEventListener('click', function() {
+    document.getElementById('{{ form.image.id_for_label }}').click();
+});
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.image-upload-container {
+    position: relative;
+}
+
+.image-preview-wrapper {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background-color: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.image-preview-wrapper:hover {
+    border-color: var(--accent-color);
+}
+
+.image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.image-preview-wrapper.has-image .image-preview {
+    opacity: 1;
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #666;
+    transition: var(--transition);
+}
+
+.image-preview-wrapper:hover .image-overlay {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.image-preview-wrapper.has-image .image-overlay {
+    opacity: 0;
+}
+
+.image-preview-wrapper.has-image:hover .image-overlay {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+}
+
+.image-overlay i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+/* Hide the actual file input */
+input[type="file"] {
+    display: none;
+}
+
+/* Modal animations */
+.modal.fade .modal-dialog {
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+}
+
+.modal.show .modal-dialog {
+    transform: scale(1);
+}
+
+/* Form animations */
+.form-control, .form-select {
+    transition: var(--transition);
+}
+
+.form-control:focus, .form-select:focus {
+    transform: translateY(-2px);
+}
+
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease-out, height 0.6s ease-out;
+}
+
+.btn:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Loading animation */
+.btn.loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.btn.loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    border-radius: inherit;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.98); }
+    100% { opacity: 1; transform: scale(1); }
+}
+</style>
+{% endblock %}

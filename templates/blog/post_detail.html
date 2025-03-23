@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load blog_filters %}
+
+{% block title %}{{ object.title }} - Blog{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <article class="card shadow-sm border-0">
+                {% if object.image %}
+                <img src="{{ object.image.url }}" class="card-img-top" alt="{{ object.title }}" style="max-height: 400px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
+                    <i class="fas fa-image text-muted" style="font-size: 3rem;"></i>
+                </div>
+                {% endif %}
+                <div class="card-body p-4">
+                    <h1 class="card-title h2 mb-3">{{ object.title }}</h1>
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="me-3">
+                            <a href="{% url 'blogger-detail' object.author.pk %}" class="text-decoration-none">
+                                {% if object.author.profile_picture %}
+                                <img src="{{ object.author.profile_picture.url }}" alt="{{ object.author.user.username }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                                {% else %}
+                                <i class="fas fa-user-circle fa-2x text-muted"></i>
+                                {% endif %}
+                            </a>
+                        </div>
+                        <div>
+                            <p class="mb-0">
+                                <a href="{% url 'blogger-detail' object.author.pk %}" class="text-decoration-none text-dark fw-bold">{{ object.author.user.username }}</a>
+                            </p>
+                            <small class="text-muted">{{ object.created_date|date:"F j, Y" }}</small>
+                        </div>
+                    </div>
+                    <div class="card-text mb-4">
+                        {{ object.content|linebreaks }}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="reaction-stats">
+                            {% if user.is_authenticated %}
+                            <div class="reaction-buttons">
+                                <button class="btn btn-sm btn-outline-primary reaction-btn {% if object|has_user_reacted:user %}active{% endif %}" data-type="LIKE">
+                                    <i class="fas fa-thumbs-up"></i>
+                                    <span class="count">{{ object.reactions|filter_reactions:'LIKE'|length }}</span>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger reaction-btn {% if object|has_user_reacted:user %}active{% endif %}" data-type="LOVE">
+                                    <i class="fas fa-heart"></i>
+                                    <span class="count">{{ object.reactions|filter_reactions:'LOVE'|length }}</span>
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning reaction-btn {% if object|has_user_reacted:user %}active{% endif %}" data-type="WOW">
+                                    <i class="fas fa-surprise"></i>
+                                    <span class="count">{{ object.reactions|filter_reactions:'WOW'|length }}</span>
+                                </button>
+                            </div>
+                            {% else %}
+                            <div class="text-muted">
+                                <i class="fas fa-sign-in-alt"></i> <a href="{% url 'login' %}">Login</a> to react
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="text-muted">
+                            <i class="fas fa-comments"></i> {{ object.comments.count }} comments
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="comments-section">
+                        <h3 class="h5 mb-4">Comments</h3>
+                        {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'add-comment' object.pk %}" class="mb-4">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <textarea name="content" class="form-control" rows="3" placeholder="Write a comment..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Post Comment</button>
+                        </form>
+                        {% else %}
+                        <div class="alert alert-info">
+                            Please <a href="{% url 'login' %}">login</a> to leave a comment.
+                        </div>
+                        {% endif %}
+                        <div class="comments-list">
+                            {% for comment in object.comments.all %}
+                            <div class="comment mb-3">
+                                <div class="d-flex align-items-start">
+                                    <div class="me-3">
+                                        {% if comment.author.profile_picture %}
+                                        <img src="{{ comment.author.profile_picture.url }}" alt="{{ comment.author.user.username }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                                        {% else %}
+                                        <i class="fas fa-user-circle fa-2x text-muted"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h4 class="h6 mb-1">
+                                                <a href="{% url 'blogger-detail' comment.author.pk %}" class="text-decoration-none text-dark">{{ comment.author.user.username }}</a>
+                                            </h4>
+                                            <small class="text-muted">{{ comment.created_date|date:"F j, Y" }}</small>
+                                        </div>
+                                        <p class="mb-0">{{ comment.content }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted">No comments yet. Be the first to comment!</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.reaction-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.reaction-btn {
+    min-width: 80px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.reaction-btn.active {
+    color: white;
+}
+
+.reaction-btn.active[data-type="LIKE"] {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.reaction-btn.active[data-type="LOVE"] {
+    background-color: var(--bs-danger);
+    border-color: var(--bs-danger);
+}
+
+.reaction-btn.active[data-type="WOW"] {
+    background-color: var(--bs-warning);
+    border-color: var(--bs-warning);
+    color: var(--bs-dark);
+}
+
+.reaction-btn.active i {
+    color: inherit;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Handle reaction buttons
+    $('.reaction-btn').click(function() {
+        var button = $(this);
+        var type = button.data('type');
+        var postId = '{{ object.pk }}';
+        
+        $.post('/post/' + postId + '/reaction/' + type + '/', {
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        })
+        .done(function(response) {
+            if (response.status === 'success') {
+                // Update all reaction counts
+                $('.reaction-btn').each(function() {
+                    var btnType = $(this).data('type');
+                    $(this).find('.count').text(response.counts[btnType]);
+                });
+                
+                // Update active states
+                $('.reaction-btn').removeClass('active');
+                if (response.action !== 'removed') {
+                    button.addClass('active');
+                }
+            }
+        })
+        .fail(function() {
+            alert('Failed to update reaction. Please try again.');
+        });
+    });
+});
+</script>
+{% endblock %}

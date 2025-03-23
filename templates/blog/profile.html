@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ user.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow slide-in">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="fas fa-user-circle me-2"></i>{{ user.username }}
+                    </h3>
+                    {% if user.blogger %}
+                        <p class="text-muted mb-3">
+                            <i class="fas fa-pen-fancy me-2"></i>Blogger
+                        </p>
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-2">Bio</h6>
+                            <p>{{ user.blogger.bio }}</p>
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-3">
+                            <i class="fas fa-user me-2"></i>Normal User
+                        </p>
+                    {% endif %}
+                    <p class="text-muted">
+                        <i class="fas fa-calendar-alt me-2"></i>Joined {{ user.date_joined|date:"F j, Y" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card shadow slide-in">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">
+                        <i class="fas fa-newspaper me-2"></i>My Blog Posts
+                    </h3>
+                    {% if user_posts %}
+                        <div class="list-group">
+                            {% for post in user_posts %}
+                                <div class="list-group-item list-group-item-action flex-column align-items-start border rounded mb-3 p-3">
+                                    <div class="d-flex w-100 justify-content-between align-items-center">
+                                        <h5 class="mb-2">{{ post.title }}</h5>
+                                        <small class="text-muted">{{ post.created_date|date:"F j, Y" }}</small>
+                                    </div>
+                                    <p class="mb-3">{{ post.content|truncatewords:30 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                            <a href="{% url 'post-detail' post.pk %}" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye me-1"></i>View
+                                            </a>
+                                            <a href="{% url 'post-update' post.pk %}" class="btn btn-outline-secondary btn-sm">
+                                                <i class="fas fa-edit me-1"></i>Edit
+                                            </a>
+                                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ post.pk }}">
+                                                <i class="fas fa-trash-alt me-1"></i>Delete
+                                            </button>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <span class="me-3">
+                                                <i class="fas fa-comment text-muted me-1"></i>
+                                                {{ post.comments.count }}
+                                            </span>
+                                            <span>
+                                                <i class="fas fa-heart text-muted me-1"></i>
+                                                {{ post.reactions.count }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteModal{{ post.pk }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Delete Post</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete "{{ post.title }}"? This action cannot be undone.</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <form action="{% url 'post-delete' post.pk %}" method="post" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-newspaper fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">You haven't created any blog posts yet.</p>
+                            {% if user.blogger %}
+                                <a href="{% url 'post-create' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Create Your First Post
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

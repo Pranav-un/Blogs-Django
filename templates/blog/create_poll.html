@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Poll - Blog{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2 class="mb-0">Create Poll</h2>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="{{ poll_form.question.id_for_label }}" class="form-label">Question</label>
+                {{ poll_form.question }}
+                {% if poll_form.question.errors %}
+                <div class="alert alert-danger mt-1">
+                    {{ poll_form.question.errors }}
+                </div>
+                {% endif %}
+            </div>
+
+            <h4 class="mb-3">Choices</h4>
+            {% for choice_form in choice_forms %}
+            <div class="mb-3">
+                <label for="{{ choice_form.choice_text.id_for_label }}" class="form-label">Choice {{ forloop.counter }}</label>
+                {{ choice_form.choice_text }}
+                {% if choice_form.choice_text.errors %}
+                <div class="alert alert-danger mt-1">
+                    {{ choice_form.choice_text.errors }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary">Create Poll</button>
+            <a href="{% url 'post-detail' post.pk %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

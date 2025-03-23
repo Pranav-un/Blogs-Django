@@ -1,0 +1,258 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Blog{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow slide-in">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">
+                        <i class="fas fa-user-plus text-primary me-2"></i>Create Account
+                    </h2>
+                    
+                    {% if messages %}
+                    <div class="messages mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post" class="needs-validation">
+                        {% csrf_token %}
+                        
+                        <!-- Username field -->
+                        <div class="form-floating mb-3">
+                            <input type="text" name="username" class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
+                                   id="id_username" placeholder="Username" required>
+                            <label for="id_username">Username</label>
+                            {% if form.username.errors %}
+                            <div class="invalid-feedback">{{ form.username.errors|join:", " }}</div>
+                            {% endif %}
+                            {% if form.username.help_text %}
+                            <small class="form-text text-muted">{{ form.username.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <!-- Email field -->
+                        <div class="form-floating mb-3">
+                            <input type="email" name="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}"
+                                   id="id_email" placeholder="Email" required>
+                            <label for="id_email">Email</label>
+                            {% if form.email.errors %}
+                            <div class="invalid-feedback">{{ form.email.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Password field -->
+                        <div class="form-floating mb-3">
+                            <input type="password" name="password1" class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
+                                   id="id_password1" placeholder="Password" required>
+                            <label for="id_password1">Password</label>
+                            {% if form.password1.errors %}
+                            <div class="invalid-feedback">{{ form.password1.errors|join:", " }}</div>
+                            {% endif %}
+                            {% if form.password1.help_text %}
+                            <div class="password-requirements mt-2">
+                                <small class="text-muted">
+                                    <ul class="ps-3 mb-0">
+                                        <li>At least 8 characters</li>
+                                        <li>Must contain letters and numbers</li>
+                                        <li>Can't be entirely numeric</li>
+                                        <li>Can't be too similar to your username</li>
+                                    </ul>
+                                </small>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Confirm Password field -->
+                        <div class="form-floating mb-4">
+                            <input type="password" name="password2" class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
+                                   id="id_password2" placeholder="Confirm Password" required>
+                            <label for="id_password2">Confirm Password</label>
+                            {% if form.password2.errors %}
+                            <div class="invalid-feedback">{{ form.password2.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- User Type Selection -->
+                        <div class="mb-4">
+                            <label class="form-label d-block mb-3">I want to register as:</label>
+                            <div class="user-type-selection">
+                                {% for value, text in form.user_type.field.choices %}
+                                <div class="form-check user-type-option">
+                                    <input type="radio" class="form-check-input" name="{{ form.user_type.name }}"
+                                           id="user_type_{{ value }}" value="{{ value }}"
+                                           {% if form.user_type.value == value %}checked{% endif %} required>
+                                    <label class="form-check-label user-type-label" for="user_type_{{ value }}">
+                                        <i class="fas {% if value == 'blogger' %}fa-pen-fancy{% else %}fa-user{% endif %} fa-2x mb-2"></i>
+                                        <span>{{ text }}</span>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.user_type.errors %}
+                            <div class="invalid-feedback d-block">{{ form.user_type.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Bio Field (Initially Hidden) -->
+                        <div class="mb-4 blogger-field" style="display: none;">
+                            <div class="form-floating">
+                                <textarea class="form-control {% if form.bio.errors %}is-invalid{% endif %}"
+                                          name="bio" id="id_bio" style="height: 120px"
+                                          placeholder="Tell us about yourself"></textarea>
+                                <label for="id_bio">Bio</label>
+                                {% if form.bio.errors %}
+                                <div class="invalid-feedback">{{ form.bio.errors|join:", " }}</div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Share your story and what you'll be blogging about
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+                            <a href="{% url 'login' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-sign-in-alt me-2"></i>Already have an account? Login
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.user-type-selection {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.user-type-option {
+    flex: 1;
+}
+
+.user-type-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    border: 2px solid #dee2e6;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.form-check-input:checked ~ .user-type-label {
+    border-color: var(--primary-color);
+    background-color: rgba(74, 144, 226, 0.1);
+    color: var(--primary-color);
+}
+
+.user-type-label:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.password-requirements ul {
+    opacity: 0.8;
+}
+
+.form-floating {
+    position: relative;
+}
+
+.form-floating > .form-control,
+.form-floating > .form-select {
+    height: calc(3.5rem + 2px);
+    padding: 1rem 0.75rem;
+}
+
+.form-floating > textarea.form-control {
+    height: 120px;
+    min-height: 120px;
+}
+
+.form-floating > label {
+    padding: 1rem 0.75rem;
+}
+
+.blogger-field {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.blogger-field.show {
+    opacity: 1;
+    max-height: 200px;
+    margin-bottom: 1.5rem;
+}
+
+.invalid-feedback {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Animations */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.is-invalid {
+    animation: shake 0.2s ease-in-out;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const userTypeInputs = document.querySelectorAll('input[name="user_type"]');
+    const bloggerFields = document.querySelector('.blogger-field');
+    const bioField = document.getElementById('id_bio');
+    
+    function toggleBloggerFields() {
+        const selectedType = document.querySelector('input[name="user_type"]:checked')?.value;
+        const isBlogger = selectedType === 'blogger';
+        
+        if (isBlogger) {
+            bloggerFields.style.display = 'block';
+            setTimeout(() => bloggerFields.classList.add('show'), 50);
+        } else {
+            bloggerFields.classList.remove('show');
+            setTimeout(() => bloggerFields.style.display = 'none', 300);
+        }
+        
+        if (bioField) {
+            bioField.required = isBlogger;
+        }
+    }
+    
+    userTypeInputs.forEach(input => {
+        input.addEventListener('change', toggleBloggerFields);
+    });
+    
+    // Initial check
+    toggleBloggerFields();
+});
+</script>
+{% endblock %}
